@@ -24,7 +24,7 @@
 ### 2.3 本地构建或预览
 操作：创建Python虚拟环境，激活环境，安装依赖，执行 python -m mkdocs build --strict 构建；执行 python -m mkdocs serve本地预览。
 
-结果：本地服务正常启动，访问http://127.0.0.1:8000/my-docs/；依次检查了首页、关于、使用指南、API参考四页，校验导航跳转、表格、代码块、页面内链接，均没有错误。
+结果：本地服务正常启动，访问`http://127.0.0.1:8000/my-docs/`,并依次检查了首页、关于、使用指南、API参考四页，校验导航跳转、表格、代码块、页面内链接，均没有错误。
 
 ![本地构建预览终端记录](images/03-local-preview.png)
 
@@ -72,7 +72,7 @@
 ## 3. 问题与解决
 记录实际现象、关键日志、原因和解决操作。
 
-1. 问题：使用Personal Access Token推送，上传deploy.yml时报错，提示没有workflow scope权限。
+### 问题1：使用Personal Access Token推送，上传deploy.yml时报错，提示没有workflow scope权限。
 
 现象：推送被拒绝，提示refusing to allow a Personal Access Token to create or update workflow。
 
@@ -80,7 +80,7 @@
 
 解决：重新生成Personal Access Token，同时勾选repo和workflow权限，使用新token完成推送。
 
-2. 问题：Actions流水线已经执行成功，网页看不到修改后的新内容。
+### 问题2：Actions流水线已经执行成功，网页看不到修改后的新内容。
 
 现象：Actions全部绿色，但网页依旧显示旧内容。
 
@@ -89,23 +89,23 @@
 解决：使用`Ctrl+F5`强制刷新，或打开浏览器无痕窗口访问，等待片刻。
 
 ## 4. 原理理解
-1. docs/ 和 site/ 各保存什么？为什么不用手工修改 site/？
+### 1. docs/ 和 site/ 各保存什么？为什么不用手工修改 site/?
 
 'docs/'存放Markdown源码文档，是我们手写编辑的源文件；'site/'是Mkdocs构建生成的静态HTML网站产物。site/是程序自动生成，修改会在下次构建被覆盖，所以不用手动修改。
 
-2. 本次工作流在什么情况下自动运行？
+### 2. 本次工作流在什么情况下自动运行？
 
 当向main分支推送代码，且修改文件属于：docs/**、mkdocs.yml、requirements.txt、.github/workflows/deploy.yml时，会自动触发；另外支持手动workflow_dispatch触发。
 
-3. build 与 deploy 两个任务有什么区别？
+### 3. build 与 deploy 两个任务有什么区别？
 
 - build：检出代码、配置Python环境、安装依赖、执行mkdocs构建，把site产物上传为构件；
 - deploy：依赖build任务完成之后才执行，把build产出的site构件正式发布到GitHub Pages。总之，build做构建，deploy做发布。
 
-4. 只修改 report/README.md 会触发部署吗？为什么？
+### 4. 只修改 report/README.md 会触发部署吗？为什么？
 
-  不会触发。工作流'on.push.paths'配置限定了只有docs、mkdocs.yml、requirements.txt、deploy.yml发生变更才触发；修改report/README.md不在触发路径列表，不会运行流水线。
+不会触发。工作流'on.push.paths'配置限定了只有docs、mkdocs.yml、requirements.txt、deploy.yml发生变更才触发；修改report/README.md不在触发路径列表，不会运行流水线。
 
-5. 本次方案为何无需创建gh-pages分支？
+### 5. 本次方案为何无需创建gh-pages分支？
 
-  本次实验使用GitHub官方Pages Actions方案，构建产物以artifact构件形式传递，直接发布到Pages服务，不需要维护独立gh‑pages分支存放静态网页。
+本次实验使用GitHub官方Pages Actions方案，构建产物以artifact构件形式传递，直接发布到Pages服务，不需要维护独立gh‑pages分支存放静态网页。
